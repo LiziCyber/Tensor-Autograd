@@ -114,6 +114,15 @@ class Tensor:
     def __matmul__(self, other) -> 'Tensor':
         return _matmul(self, other)
 
+    def __invert__(self) -> 'Tensor':
+        return _tensor_inv(self)
+
+    def __truediv__(self, other):
+        return _tensor_div(self, ensure_tensor(other))
+
+    def __rtruediv__(self, other):
+        return _tensor_div(ensure_tensor(other), self)
+
     def __getitem__(self, item) -> 'Tensor':
         return _slice(self, item)
 
@@ -358,3 +367,22 @@ def _slice(a: Tensor, idx) -> Tensor:
         depends_on = []
 
     return Tensor(data, requires_grad, depends_on)
+
+
+def _tensor_inv(a: Tensor) -> Tensor:
+    data = a.data
+    requires_grad = a.requires_grad
+
+    if requires_grad:
+        def grad_fn(grad: np.ndarray) -> np.ndarray:
+            return -grad / (a.data * a.data)
+
+        depends_on = [Dependency(a, grad_fn)]
+    else:
+        depends_on = []
+
+    return Tensor(data, requires_grad, depends_on)
+
+
+def _tensor_div(a: Tensor, b: Tensor) -> Tensor:
+    return a * _tensor_inv(b)
