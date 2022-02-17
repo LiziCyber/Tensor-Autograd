@@ -115,7 +115,7 @@ class Tensor:
         return _matmul(self, other)
 
     def __getitem__(self, item) -> 'Tensor':
-        return _slice(item)
+        return _slice(self, item)
 
 
 def _tensor_sum(t: Tensor) -> Tensor:
@@ -343,7 +343,7 @@ def _matmul(a: Tensor, b: Tensor) -> Tensor:
     return Tensor(data, requires_grad, depends_on)
 
 
-def _slice(a: Tensor, *idx) -> Tensor:
+def _slice(a: Tensor, idx) -> Tensor:
     data = a.data[idx]
     requires_grad = a.requires_grad
 
