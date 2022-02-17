@@ -35,3 +35,8 @@ class TestTensorAdd(unittest.TestCase):
 
         assert a.grad.data.tolist() == [9, 12, 24]
         assert b.grad.data.tolist() == [[-3, -4, -8], [-3, -4, -8], [-3, -4, -8]]
+
+    def test_sub4(self):
+        a = Tensor([1, 2, 3], requires_grad=True)
+        a -= 1
+        assert a.data.tolist() == [0, 1, 2]

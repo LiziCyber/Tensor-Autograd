@@ -330,8 +330,8 @@ def _matmul(a: Tensor, b: Tensor) -> Tensor:
     :param b: right tensor
     :return: a tensor representing the sum of the two tensor
     """
-    assert a.data.ndim == b.data.ndim == 2
-    assert a.data.shape[1] == b.data.shape[0]
+    assert a.data.ndim <= 2
+    assert b.data.ndim <= 2
 
     data = a.data @ b.data
     requires_grad = a.requires_grad or b.requires_grad
@@ -370,7 +370,7 @@ def _slice(a: Tensor, idx) -> Tensor:
 
 
 def _tensor_inv(a: Tensor) -> Tensor:
-    data = a.data
+    data = 1 / a.data
     requires_grad = a.requires_grad
 
     if requires_grad:

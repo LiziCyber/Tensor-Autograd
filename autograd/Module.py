@@ -16,3 +16,8 @@ class Module:
         for parameter in self.parameters():
             parameter.zero_grad()
 
+    def forward(self, *input, **kwargs):
+        raise NotImplemented("Undefined forward method")
+
+    def __call__(self, *input, **kwargs) -> Tensor:
+        return self.forward(*input, **kwargs)
