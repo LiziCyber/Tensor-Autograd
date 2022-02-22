@@ -4,6 +4,6 @@ NumPy to conduct computation.
     
 ### [TODO]:
 - [x] ~~Add Layers~~
-- [ ] New Activation Functions
+- [x] ~~New Activation Functions~~
 - [ ] More Optimizer options
 - [ ] Beyond Linear Layers
