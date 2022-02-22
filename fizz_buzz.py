@@ -41,9 +41,9 @@ class FizzBuzzModel(Module):
         return x3
 
 
-optimizer = SGD(lr=0.001)
 batch_size = 32
 model = FizzBuzzModel()
+optimizer = SGD(model, lr=0.001)
 
 starts = np.arange(0, x_train.shape[0], batch_size)
 for epoch in range(1000):

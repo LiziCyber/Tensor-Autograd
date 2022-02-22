@@ -23,3 +23,46 @@ class Linear(Module):
     def forward(self, input: Tensor) -> Tensor:
         return linear(input, self.w, self.b)
 
+
+class ReLU(Module):
+    def __init__(self):
+        super(self).__init__()
+
+    def forward(self, input: Tensor) -> Tensor:
+        return relu(input)
+
+
+class Sigmoid(Module):
+    def __init__(self):
+        super(self).__init__()
+
+    def forward(self, input: Tensor) -> Tensor:
+        return sigmoid(input)
+
+
+class Tanh(Module):
+    def __init__(self):
+        super(self).__init__()
+
+    def forward(self, input: Tensor) -> Tensor:
+        return tanh(input)
+
+
+class Threshold(Module):
+    def __init__(self,
+                 thr: float = None,
+                 val: float = None):
+        super(self).__init__()
+        self.thr = thr
+        self.val = val
+
+    def forward(self, input: Tensor) -> Tensor:
+        return threshold(input, self.thr, self.val)
+
+
+class Softmax(Module):
+    def __init__(self):
+        super(self).__init__()
+
+    def forward(self, input: Tensor) -> Tensor:
+        return softmax(input)

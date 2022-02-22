@@ -33,7 +33,7 @@ def log(x: Tensor) -> Tensor:
     return Tensor(data, requires_grad, depends_on)
 
 
-def logistic(x: Tensor) -> Tensor:
+def sigmoid(x: Tensor) -> Tensor:
     temp = np.exp(x.data)
     data = 1 / (1 + np.exp(-temp))
     requires_grad = x.requires_grad

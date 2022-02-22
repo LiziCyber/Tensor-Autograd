@@ -20,8 +20,8 @@ class Model(Module):
         return self.l1(input)
 
 
-optimizer = SGD(lr=0.01)
 model = Model(3, 1)
+optimizer = SGD(model, lr=0.01)
 
 for epoch in range(1000):
     epoch_loss = 0.0
