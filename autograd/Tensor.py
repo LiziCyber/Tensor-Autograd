@@ -48,6 +48,13 @@ class Tensor:
         self._data = new_data
         self.grad = None
 
+    @property
+    def numel(self) -> int:
+        res = 1
+        for i in self.shape:
+            res *= i
+        return res
+
     def __repr__(self):
         return f"Tensor({self.data}, requires_grad={self.requires_grad})"
 
@@ -68,6 +75,9 @@ class Tensor:
 
     def sum(self) -> 'Tensor':
         return _tensor_sum(self)
+
+    def mean(self) -> 'Tensor':
+        return _tensor_mean(self)
 
     def __add__(self, other: 'Tensor') -> 'Tensor':
         return _tensor_add(self, ensure_tensor(other))
@@ -99,15 +109,6 @@ class Tensor:
         self.data = self.data - ensure_tensor(other).data
         return self
 
-    def __pow__(self, power, modulo=None) -> 'Tensor':
-        if modulo is not None:
-            raise NotImplementedError("modulo is not supported")
-
-        return _tensor_pow(self, ensure_tensor(power))
-
-    def __rpow__(self, other) -> 'Tensor':
-        return _tensor_pow(ensure_tensor(other), self)
-
     def __neg__(self) -> 'Tensor':
         return _tensor_neg(self)
 
@@ -122,6 +123,9 @@ class Tensor:
 
     def __rtruediv__(self, other):
         return _tensor_div(ensure_tensor(other), self)
+
+    def __abs__(self):
+        return _tensor_abs(self)
 
     def __getitem__(self, item) -> 'Tensor':
         return _slice(self, item)
@@ -272,57 +276,6 @@ def _tensor_sub(a: Tensor, b: Tensor) -> Tensor:
     return _tensor_add(a, _tensor_neg(b))
 
 
-def _tensor_pow(a: Tensor, b: Tensor) -> Tensor:
-    """
-    Not finished yet
-    """
-    data = a.data ** b.data
-    requires_grad = a.requires_grad or b.requires_grad
-    depends_on: List[Dependency] = []
-
-    if a.requires_grad:
-        def grad_fn1(grad: np.ndarray) -> np.ndarray:
-            grad = grad * b.data
-
-            # added ndim explicitly
-            ndims_added = grad.ndim - a.data.ndim
-            for _ in range(ndims_added):
-                grad = grad.sum(axis=0)
-
-            # no added ndim but still broadcasting through the dims which have size 1
-            for i, size in enumerate(a.shape):
-                if size == 1:
-                    grad = grad.sum(axis=i, keepdims=True)
-                else:
-                    break
-
-            return grad
-
-        depends_on.append(Dependency(a, grad_fn1))
-
-    if b.requires_grad:
-        def grad_fn2(grad: np.ndarray) -> np.ndarray:
-            grad = grad * a.data
-
-            # added ndim explicitly
-            ndims_added = grad.ndim - b.data.ndim
-            for _ in range(ndims_added):
-                grad = grad.sum(axis=0)
-
-            # no added ndim but still broadcasting through the dims which have size 1
-            for i, size in enumerate(b.shape):
-                if size == 1:
-                    grad = grad.sum(axis=i, keepdims=True)
-                else:
-                    break
-
-            return grad
-
-        depends_on.append(Dependency(b, grad_fn2))
-
-    return Tensor(data, requires_grad, depends_on)
-
-
 def _matmul(a: Tensor, b: Tensor) -> Tensor:
     """
     Return the multiplication of two Tensor. Broadcasting is allowed.
@@ -386,3 +339,22 @@ def _tensor_inv(a: Tensor) -> Tensor:
 
 def _tensor_div(a: Tensor, b: Tensor) -> Tensor:
     return a * _tensor_inv(b)
+
+
+def _tensor_abs(a: Tensor) -> Tensor:
+    data = abs(a.data)
+    requires_grad = a.requires_grad
+
+    if requires_grad:
+        def grad_fn(grad: np.ndarray) -> np.ndarray:
+            return grad * np.sign(a.data)
+
+        depends_on = [Dependency(a, grad_fn)]
+    else:
+        depends_on = []
+
+    return Tensor(data, requires_grad, depends_on)
+
+
+def _tensor_mean(a: Tensor) -> Tensor:
+    return a.sum() / a.numel

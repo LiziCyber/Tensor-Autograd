@@ -3,7 +3,7 @@ This repository implemented an auto gradient framework solely based on Python wi
 NumPy to conduct computation.  
     
 ### [TODO]:
-- [x] Add Layers
+- [x] ~~Add Layers~~
 - [ ] New Activation Functions
 - [ ] More Optimizer options
 - [ ] Beyond Linear Layers

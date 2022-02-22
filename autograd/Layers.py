@@ -1,6 +1,7 @@
 from autograd.Tensor import Tensor
 from autograd.Parameter import Parameter
 from autograd.Module import Module
+from autograd.Function import *
 from typing import Optional, NamedTuple, Union
 
 
@@ -20,5 +21,5 @@ class Linear(Module):
             self.b = None
 
     def forward(self, input: Tensor) -> Tensor:
-        return (input @ self.w) + (self.b or 0)
+        return linear(input, self.w, self.b)
 
